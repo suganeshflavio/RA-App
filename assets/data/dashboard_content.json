@@ -1,0 +1,303 @@
+{
+  "school": {
+    "name": "TKS Academy",
+    "location": "Tamil Nadu, India"
+  },
+  "resources": [
+    {
+      "title": "Revision Notes",
+      "subtitle": "1418 items",
+      "icon": "notes",
+      "accent": "#3182CE"
+    },
+    {
+      "title": "Last Year Papers",
+      "subtitle": "197 items",
+      "icon": "clipboard",
+      "accent": "#2FBE8C"
+    },
+    {
+      "title": "Exemplar Solutions",
+      "subtitle": "Textbook Solutions",
+      "icon": "book",
+      "accent": "#5B7FFF"
+    },
+    {
+      "title": "NCERT Solutions Part-I",
+      "subtitle": "Textbook Solutions",
+      "icon": "book-open",
+      "accent": "#4F85F5"
+    },
+    {
+      "title": "NCERT Solutions Part-II",
+      "subtitle": "Textbook Solutions",
+      "icon": "book-open",
+      "accent": "#3A7AE0"
+    },
+    {
+      "title": "Previous Year Questions",
+      "subtitle": "4242 questions",
+      "icon": "shield",
+      "accent": "#20A37A"
+    },
+    {
+      "title": "Important Questions",
+      "subtitle": "700 questions",
+      "icon": "spark",
+      "accent": "#FF7E57"
+    }
+  ],
+  "tests": [
+    {
+      "title": "Algebra Mid-Term Mock",
+      "subject": "Mathematics",
+      "questionCount": 40,
+      "duration": "45m",
+      "status": "Scheduled"
+    },
+    {
+      "title": "Cell Biology Practice",
+      "subject": "Science",
+      "questionCount": 30,
+      "duration": "35m",
+      "status": "Available"
+    },
+    {
+      "title": "Reading Comprehension Set",
+      "subject": "English",
+      "questionCount": 25,
+      "duration": "30m",
+      "status": "Available"
+    }
+  ],
+  "progress": [
+    {
+      "label": "Weekly Completion",
+      "value": "76%",
+      "detail": "19 of 25 planned lessons",
+      "accent": "#F97416"
+    },
+    {
+      "label": "Average Test Score",
+      "value": "84%",
+      "detail": "Last 5 tests",
+      "accent": "#22A45D"
+    },
+    {
+      "label": "Study Streak",
+      "value": "11 days",
+      "detail": "Current active streak",
+      "accent": "#3B82F6"
+    }
+  ],
+  "videos": [
+    {
+      "title": "Getting Started With Python",
+      "subtitle": "FreeCodeCamp classroom sample",
+      "youtubeId": "rfscVS0vtbw",
+      "duration": "4h 26m",
+      "description": "A long-form sample lesson you can use to verify that only YouTube videos play inside the app."
+    },
+    {
+      "title": "JavaScript Basics for Beginners",
+      "subtitle": "Core syntax and flow",
+      "youtubeId": "W6NZfCO5SIk",
+      "duration": "48m",
+      "description": "A second sample lesson for the Videos section with a direct YouTube player."
+    },
+    {
+      "title": "UI Design Foundations",
+      "subtitle": "Design thinking sample",
+      "youtubeId": "c9Wg6Cb_YlU",
+      "duration": "17m",
+      "description": "A short design-focused sample that keeps the app limited to YouTube playback only."
+    }
+  ],
+  "courses": [
+    {
+      "title": "Responsive Design With Grids",
+      "price": 199.0,
+      "salePrice": 149.0,
+      "lessons": 15,
+      "duration": "11h 30m",
+      "rating": 4.3,
+      "reviewCount": 3700,
+      "language": "English",
+      "mentorName": "Athena Joy",
+      "mentorFollowers": "236k followers",
+      "description": "In this class, you will learn responsive grid systems, UX structure, and practical layout decisions for real mobile products.",
+      "youtubeId": "c9Wg6Cb_YlU",
+      "thumbnailAsset": "assets/images/tks_campus_banner.png",
+      "mentorAvatarAsset": "assets/images/tks_mentor_avatar.png",
+      "subjects": [
+        {
+          "title": "Design Foundations",
+          "description": "Understand spacing, color, and visual hierarchy",
+          "chapters": [
+            {
+              "title": "Layout Basics",
+              "topics": [
+                {
+                  "title": "Grid Systems in Mobile",
+                  "duration": "18m",
+                  "youtubeId": "c9Wg6Cb_YlU",
+                  "summary": "Build stable responsive layouts with practical grids."
+                },
+                {
+                  "title": "Whitespace and Rhythm",
+                  "duration": "14m",
+                  "youtubeId": "c9Wg6Cb_YlU",
+                  "summary": "Balance UI breathing room for readability."
+                }
+              ]
+            },
+            {
+              "title": "Real App Patterns",
+              "topics": [
+                {
+                  "title": "Designing Card Interfaces",
+                  "duration": "16m",
+                  "youtubeId": "c9Wg6Cb_YlU",
+                  "summary": "Craft card-based surfaces with clear information density."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Visual Consistency",
+          "description": "Token-based color and typography systems",
+          "chapters": [
+            {
+              "title": "Theme Tokens",
+              "topics": [
+                {
+                  "title": "Building a Cohesive Theme",
+                  "duration": "22m",
+                  "youtubeId": "c9Wg6Cb_YlU",
+                  "summary": "Create reusable colors and component accents."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Data Structures With JavaScript",
+      "price": 179.0,
+      "salePrice": 129.0,
+      "lessons": 21,
+      "duration": "9h 10m",
+      "rating": 4.7,
+      "reviewCount": 2100,
+      "language": "English",
+      "mentorName": "Jason Reed",
+      "mentorFollowers": "118k followers",
+      "description": "This dummy course uses a YouTube lesson as the hero media and gives you a clean course detail layout to keep building on.",
+      "youtubeId": "W6NZfCO5SIk",
+      "thumbnailAsset": "assets/images/tks_campus_banner.png",
+      "mentorAvatarAsset": "assets/images/tks_mentor_avatar.png",
+      "subjects": [
+        {
+          "title": "Arrays and Strings",
+          "description": "Core linear structure operations",
+          "chapters": [
+            {
+              "title": "Array Patterns",
+              "topics": [
+                {
+                  "title": "Two Pointer Technique",
+                  "duration": "19m",
+                  "youtubeId": "W6NZfCO5SIk",
+                  "summary": "Solve comparison problems efficiently."
+                },
+                {
+                  "title": "Sliding Window",
+                  "duration": "17m",
+                  "youtubeId": "W6NZfCO5SIk",
+                  "summary": "Handle contiguous range problems quickly."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Stacks and Queues",
+          "description": "Understand FIFO and LIFO in real problems",
+          "chapters": [
+            {
+              "title": "Monotonic Stack",
+              "topics": [
+                {
+                  "title": "Nearest Greater Element",
+                  "duration": "21m",
+                  "youtubeId": "W6NZfCO5SIk",
+                  "summary": "Optimize next/previous greater queries."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Python for Class Projects",
+      "price": 149.0,
+      "salePrice": 99.0,
+      "lessons": 18,
+      "duration": "7h 45m",
+      "rating": 4.8,
+      "reviewCount": 5200,
+      "language": "English",
+      "mentorName": "Nadia Khan",
+      "mentorFollowers": "302k followers",
+      "description": "A practical classroom-style Python course wired to a YouTube lesson so the Videos section and course details share the same sample media source.",
+      "youtubeId": "rfscVS0vtbw",
+      "thumbnailAsset": "assets/images/tks_campus_banner.png",
+      "mentorAvatarAsset": "assets/images/tks_mentor_avatar.png",
+      "subjects": [
+        {
+          "title": "Python Basics",
+          "description": "Syntax, variables, loops, and functions",
+          "chapters": [
+            {
+              "title": "Core Syntax",
+              "topics": [
+                {
+                  "title": "Variables and Data Types",
+                  "duration": "20m",
+                  "youtubeId": "rfscVS0vtbw",
+                  "summary": "Start coding with clean Python fundamentals."
+                },
+                {
+                  "title": "Conditionals and Loops",
+                  "duration": "24m",
+                  "youtubeId": "rfscVS0vtbw",
+                  "summary": "Control program flow for classroom tasks."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Mini Project Workflow",
+          "description": "Structure a complete class project",
+          "chapters": [
+            {
+              "title": "Project Setup",
+              "topics": [
+                {
+                  "title": "Build a Quiz CLI",
+                  "duration": "27m",
+                  "youtubeId": "rfscVS0vtbw",
+                  "summary": "Combine input, loops, and scoring in one app."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
