@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../core/theme/app_colors.dart';
 
 class BannerCarousel extends StatefulWidget {
   const BannerCarousel({super.key, required this.imagePaths});
@@ -86,8 +87,8 @@ class _BannerCarouselState extends State<BannerCarousel> {
                 height: 7,
                 decoration: BoxDecoration(
                   color: isActive
-                      ? const Color(0xFFF97316)
-                      : const Color(0xFFFFDDBF),
+                      ? AppColors.primary
+                      : AppColors.cardBorder,
                   borderRadius: BorderRadius.circular(999),
                 ),
               );

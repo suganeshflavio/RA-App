@@ -151,7 +151,7 @@ class _SignupPageState extends State<SignupPage> {
                         const SizedBox(height: 6),
                         Center(
                           child: Text(
-                            'Join TKS Academy and start learning today',
+                            "Join Ramar's Academy and start learning today",
                             style: AppTypography.bodyMedium,
                             textAlign: TextAlign.center,
                           ),

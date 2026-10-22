@@ -3,6 +3,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import 'pdf_viewer.dart';
 import 'skeleton.dart';
+import '../core/theme/app_colors.dart';
 
 /// Renders a note/attachment for a video. PDFs use the native
 /// [PdfViewer] (flutter_pdfview); other office formats (PPT/DOC/XLS, etc.)
@@ -62,7 +63,7 @@ class _OfficeDocumentViewerState extends State<_OfficeDocumentViewer> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFFFDDBF)),
+        border: Border.all(color: AppColors.cardBorder),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),

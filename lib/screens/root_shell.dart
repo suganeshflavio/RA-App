@@ -55,14 +55,14 @@ class _RootShellState extends State<RootShell> {
                 label: 'Courses',
               ),
               NavigationDestination(
-                icon: Icon(Icons.rate_review_outlined),
-                selectedIcon: Icon(Icons.rate_review_rounded),
-                label: 'Review',
-              ),
-              NavigationDestination(
                 icon: Icon(Icons.person_outline_rounded),
                 selectedIcon: Icon(Icons.person_rounded),
                 label: 'Profile',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.rate_review_outlined),
+                selectedIcon: Icon(Icons.rate_review_rounded),
+                label: 'Review',
               ),
             ],
           ),

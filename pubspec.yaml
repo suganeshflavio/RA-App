@@ -40,6 +40,7 @@ dependencies:
   video_player: ^2.13.0
   flutter_pdfview: ^1.4.4
   path_provider: ^2.1.6
+  html: ^0.15.6
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -57,16 +58,16 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/tks_academy_logo.png"
+  image_path: "assets/images/ramars_academy_icon.png"
   remove_alpha_ios: true
 
 flutter_native_splash:
-  color: "#FFF7ED"
-  image: assets/images/tks_academy_logo.png
+  color: "#FFFFFF"
+  image: assets/images/ramars_academy_logo.png
   android_12:
-    image: assets/images/tks_academy_logo.png
+    image: assets/images/ramars_academy_logo.png
     icon_background_color: "#FFFFFF"
-    color: "#FFF7ED"
+    color: "#FFFFFF"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -82,6 +83,8 @@ flutter:
   assets:
     - assets/data/dashboard_content.json
     - assets/images/
+    - assets/katex/
+    - assets/katex/fonts/
     - .env
 
   # To add assets to your application, add an assets section, like this:

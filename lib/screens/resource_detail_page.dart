@@ -14,7 +14,7 @@ class ResourceDetailPage extends StatelessWidget {
       backgroundColor: AppColors.primarySubtle,
       appBar: AppBar(
         backgroundColor: AppColors.primarySubtle,
-        foregroundColor: const Color(0xFF3A1E0B),
+        foregroundColor: AppColors.textPrimary,
         elevation: 0,
         title: Text(resource.title),
       ),
@@ -26,7 +26,7 @@ class ResourceDetailPage extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: const Color(0xFFFFDDBF)),
+            border: Border.all(color: AppColors.cardBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,18 +36,18 @@ class ResourceDetailPage extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
-                  color: Color(0xFF3A1E0B),
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 resource.subtitle,
-                style: const TextStyle(fontSize: 16, color: Color(0xFF8F6A4D)),
+                style: const TextStyle(fontSize: 16, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 14),
               const Text(
                 'This resource detail page is now fully connected from Home -> Resources and each item opens here for deeper content access.',
-                style: TextStyle(height: 1.7, color: Color(0xFF6E4D37)),
+                style: TextStyle(height: 1.7, color: AppColors.textSecondary),
               ),
             ],
           ),

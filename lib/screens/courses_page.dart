@@ -10,6 +10,8 @@ import '../widgets/custom_buttons.dart';
 import '../widgets/custom_card.dart';
 import '../widgets/inline_search_field.dart';
 import '../widgets/skeleton.dart';
+import 'course_mcq_tests_page.dart';
+import 'course_notes_page.dart';
 import 'subject_page.dart';
 
 class CoursesPage extends StatefulWidget {
@@ -21,6 +23,27 @@ class CoursesPage extends StatefulWidget {
 
 class _CoursesPageState extends State<CoursesPage> {
   String _query = '';
+
+  void _openCourse(UserCourse course) {
+    switch (course.category) {
+      case CourseCategory.notes:
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => CourseNotesPage(course: course)),
+        );
+      case CourseCategory.test:
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => CourseMcqTestsPage(course: course),
+          ),
+        );
+      case CourseCategory.video:
+      case CourseCategory.mixed:
+      case CourseCategory.empty:
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => SubjectPage(course: course)),
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +109,12 @@ class _CoursesPageState extends State<CoursesPage> {
                         ),
                       )
                     else
-                      ...courses.map((course) => _CourseCard(course: course)),
+                      ...courses.map(
+                        (course) => _CourseCard(
+                          course: course,
+                          onTap: () => _openCourse(course),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -95,39 +123,86 @@ class _CoursesPageState extends State<CoursesPage> {
   }
 }
 
+class _CourseCategoryStyle {
+  const _CourseCategoryStyle({
+    required this.icon,
+    required this.label,
+    required this.background,
+    required this.foreground,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color background;
+  final Color foreground;
+}
+
+_CourseCategoryStyle _styleFor(CourseCategory category) {
+  switch (category) {
+    case CourseCategory.video:
+      return const _CourseCategoryStyle(
+        icon: Icons.menu_book_rounded,
+        label: 'Course',
+        background: AppColors.primaryLight,
+        foreground: AppColors.primaryDark,
+      );
+    case CourseCategory.notes:
+      return const _CourseCategoryStyle(
+        icon: Icons.menu_book_outlined,
+        label: 'Notes (eBook)',
+        background: AppColors.secondaryLight,
+        foreground: AppColors.secondaryDark,
+      );
+    case CourseCategory.test:
+      return const _CourseCategoryStyle(
+        icon: Icons.quiz_rounded,
+        label: 'MCQ Test',
+        background: AppColors.primaryLight,
+        foreground: AppColors.primaryDark,
+      );
+    case CourseCategory.mixed:
+      return const _CourseCategoryStyle(
+        icon: Icons.dashboard_customize_rounded,
+        label: 'Notes & MCQ',
+        background: AppColors.secondaryLight,
+        foreground: AppColors.secondaryDark,
+      );
+    case CourseCategory.empty:
+      return const _CourseCategoryStyle(
+        icon: Icons.hourglass_empty_rounded,
+        label: 'No content yet',
+        background: AppColors.surfaceVariant,
+        foreground: AppColors.textMuted,
+      );
+  }
+}
+
 class _CourseCard extends StatelessWidget {
-  const _CourseCard({required this.course});
+  const _CourseCard({required this.course, required this.onTap});
 
   final UserCourse course;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final style = _styleFor(course.category);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: AppCard(
         padding: const EdgeInsets.all(18),
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => SubjectPage(course: course),
-            ),
-          );
-        },
+        onTap: onTap,
         child: Row(
           children: [
             Container(
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: AppColors.primaryLight,
+                color: style.background,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.primaryDark.withValues(alpha: 0.2)),
+                border: Border.all(color: style.foreground.withValues(alpha: 0.2)),
               ),
-              child: const Icon(
-                Icons.menu_book_rounded,
-                color: AppColors.primaryDark,
-                size: 26,
-              ),
+              child: Icon(style.icon, color: style.foreground, size: 26),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -139,27 +214,17 @@ class _CourseCard extends StatelessWidget {
                     style: AppTypography.titleLarge.copyWith(fontSize: 17),
                   ),
                   const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      AppChip(
-                        label: '${course.subjects.length} Subjects',
-                        backgroundColor: AppColors.surfaceVariant,
-                        textColor: AppColors.textSecondary,
-                      ),
-                      const SizedBox(width: 8),
-                      AppChip(
-                        label: '${course.chapterCount} Chapters',
-                        backgroundColor: AppColors.primaryLight,
-                        textColor: AppColors.primaryDark,
-                      ),
-                    ],
+                  AppChip(
+                    label: style.label,
+                    backgroundColor: style.background,
+                    textColor: style.foreground,
                   ),
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.arrow_forward_ios_rounded,
-              color: AppColors.primaryDark,
+              color: style.foreground,
               size: 18,
             ),
           ],

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../core/theme/app_colors.dart';
 import '../models/testimonial.dart';
 
 class ReviewsCarousel extends StatefulWidget {
@@ -62,16 +63,16 @@ class _ReviewsCarouselState extends State<ReviewsCarousel> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: const Color(0xFFFFDDBF)),
+                  border: Border.all(color: AppColors.cardBorder),
                 ),
                 child: Row(
                   children: [
                     const CircleAvatar(
                       radius: 18,
-                      backgroundColor: Color(0xFFFFE6D2),
+                      backgroundColor: AppColors.primaryLight,
                       child: Icon(
                         Icons.person_rounded,
-                        color: Color(0xFFF97316),
+                        color: AppColors.primary,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -89,7 +90,7 @@ class _ReviewsCarouselState extends State<ReviewsCarousel> {
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w700,
-                                    color: Color(0xFF3A1E0B),
+                                    color: AppColors.textPrimary,
                                   ),
                                 ),
                               ),
@@ -99,8 +100,8 @@ class _ReviewsCarouselState extends State<ReviewsCarousel> {
                                     i < testimonial.star
                                         ? Icons.star_rounded
                                         : Icons.star_border_rounded,
-                                    size: 13,
-                                    color: const Color(0xFFF97316),
+                                    size: 14,
+                                    color: AppColors.brandGold,
                                   );
                                 }),
                               ),
@@ -112,7 +113,7 @@ class _ReviewsCarouselState extends State<ReviewsCarousel> {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                              color: Color(0xFF6E4D37),
+                              color: AppColors.textSecondary,
                               fontSize: 13,
                               height: 1.3,
                             ),

@@ -15,7 +15,7 @@ class ProgressPage extends StatelessWidget {
       backgroundColor: AppColors.primarySubtle,
       appBar: AppBar(
         backgroundColor: AppColors.primarySubtle,
-        foregroundColor: const Color(0xFF3A1E0B),
+        foregroundColor: AppColors.textPrimary,
         elevation: 0,
         title: const Text('Progress'),
       ),
@@ -30,7 +30,7 @@ class ProgressPage extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: const Color(0xFFFFDDBF)),
+                border: Border.all(color: AppColors.cardBorder),
               ),
               child: Row(
                 children: [
@@ -51,13 +51,13 @@ class ProgressPage extends StatelessWidget {
                           metric.label,
                           style: const TextStyle(
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF3A1E0B),
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           metric.detail,
-                          style: const TextStyle(color: Color(0xFF8F6A4D)),
+                          style: const TextStyle(color: AppColors.textSecondary),
                         ),
                       ],
                     ),
@@ -80,7 +80,7 @@ class ProgressPage extends StatelessWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF3A1E0B),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 10),
@@ -92,7 +92,7 @@ class ProgressPage extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFFFDDBF)),
+                border: Border.all(color: AppColors.cardBorder),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,7 +101,7 @@ class ProgressPage extends StatelessWidget {
                     course.title,
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF3A1E0B),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -110,14 +110,14 @@ class ProgressPage extends StatelessWidget {
                     child: LinearProgressIndicator(
                       minHeight: 9,
                       value: completion / 100,
-                      color: const Color(0xFFF97316),
-                      backgroundColor: const Color(0xFFFFE9D8),
+                      color: AppColors.secondary,
+                      backgroundColor: AppColors.primaryLight,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     '$completion% completed',
-                    style: const TextStyle(color: Color(0xFF8F6A4D)),
+                    style: const TextStyle(color: AppColors.textSecondary),
                   ),
                 ],
               ),

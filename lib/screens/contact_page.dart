@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../core/network/api_client.dart';
+import '../core/network/api_exception.dart';
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_typography.dart';
+import '../models/enquiry.dart';
+import '../repositories/enquiry_repository.dart';
+import '../state/session_state.dart';
 import '../widgets/app_background.dart';
 import '../widgets/custom_buttons.dart';
 import '../widgets/custom_card.dart';
@@ -19,6 +25,7 @@ class _ContactPageState extends State<ContactPage> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _messageController = TextEditingController();
+  final _enquiryRepository = EnquiryRepository(ApiClient());
 
   String _selectedCategory = 'General Inquiry';
   bool _isSubmitting = false;
@@ -30,6 +37,24 @@ class _ContactPageState extends State<ContactPage> {
     // 'Payment & Subscription',
     'Feedback & Suggestions',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final session = context.read<SessionState>();
+      final user = session.user;
+      if (user != null) {
+        if (_nameController.text.trim().isEmpty && user.name.isNotEmpty) {
+          _nameController.text = user.name;
+        }
+        if (_emailController.text.trim().isEmpty && user.email.isNotEmpty) {
+          _emailController.text = user.email;
+        }
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -44,52 +69,101 @@ class _ContactPageState extends State<ContactPage> {
       return;
     }
 
+    FocusScope.of(context).unfocus();
     setState(() => _isSubmitting = true);
 
-    // Simulate API network latency for realistic submission behavior
-    await Future.delayed(const Duration(milliseconds: 1200));
-
-    if (!mounted) return;
-
-    setState(() => _isSubmitting = false);
-
-    // Clear form inputs
-    _nameController.clear();
-    _emailController.clear();
-    _messageController.clear();
-
-    // Show success dialog
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+    try {
+      final responseMessage = await _enquiryRepository.submitEnquiry(
+        EnquiryRequest(
+          name: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          category: _selectedCategory,
+          message: _messageController.text.trim(),
         ),
-        title: Row(
-          children: const [
-            Icon(Icons.check_circle_rounded, color: AppColors.success, size: 28),
-            SizedBox(width: 10),
-            Text('Message Sent!'),
+      );
+
+      if (!mounted) return;
+
+      // Clear message field after successful submission
+      _messageController.clear();
+
+      final session = context.read<SessionState>();
+      if (session.user == null) {
+        _nameController.clear();
+        _emailController.clear();
+      }
+
+      // Show success dialog
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: const [
+              Icon(Icons.check_circle_rounded, color: AppColors.success, size: 28),
+              SizedBox(width: 10),
+              Text('Message Sent!'),
+            ],
+          ),
+          content: Text(
+            (responseMessage != null && responseMessage.isNotEmpty)
+                ? responseMessage
+                : "Thank you for reaching out to Ramar's Academy. Our support team will review your message and respond within 24 hours.",
+            style: AppTypography.bodyMedium,
+          ),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('OK', style: TextStyle(color: Colors.white)),
+            ),
           ],
         ),
-        content: const Text(
-          'Thank you for reaching out to TKS Academy. Our support team will review your message and respond within 24 hours.',
-          style: AppTypography.bodyMedium,
-        ),
-        actions: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('OK', style: TextStyle(color: Colors.white)),
+      );
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          content: Row(
+            children: [
+              const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Expanded(child: Text(e.message)),
+            ],
           ),
-        ],
-      ),
-    );
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          content: const Row(
+            children: [
+              Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
+              SizedBox(width: 8),
+              Expanded(child: Text('Failed to submit enquiry. Please try again.')),
+            ],
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
   }
 
   @override
@@ -160,8 +234,8 @@ class _ContactPageState extends State<ContactPage> {
                   iconBg: Color(0xFFEFF6FF),
                   iconColor: Color(0xFF2563EB),
                   title: 'Email Support',
-                  primaryDetail: 'support@tksacademy.com',
-                  secondaryDetail: 'info@tksacademy.com',
+                  primaryDetail: 'ramarsacademy@gmail.com',
+                  // secondaryDetail: 'demo33@gmail.com',
                 ),
                 const SizedBox(height: 10),
                 const _ContactDetailCard(
@@ -169,17 +243,17 @@ class _ContactPageState extends State<ContactPage> {
                   iconBg: Color(0xFFECFDF5),
                   iconColor: Color(0xFF059669),
                   title: 'Phone & WhatsApp',
-                  primaryDetail: '+91 98765 43210',
-                  secondaryDetail: '+1 (800) 555-0199 (Toll Free)',
+                  primaryDetail: '+91 82207 25085',
+                  // secondaryDetail: '+91 78956 64688',
                 ),
                 const SizedBox(height: 10),
                 const _ContactDetailCard(
                   icon: Icons.location_on_rounded,
-                  iconBg: Color(0xFFFFF7ED),
-                  iconColor: Color(0xFFEA580C),
+                  iconBg: AppColors.secondaryLight,
+                  iconColor: AppColors.secondary,
                   title: 'Campus / Main Office',
-                  primaryDetail: 'TKS Tower, 4th Floor, Knowledge Park',
-                  secondaryDetail: 'Tech Corridor, Metro City - 600001',
+                  primaryDetail: 'No:6, 2nd cross vidhya Nagar, Ammapet Salem - 636003',
+                  // secondaryDetail: 'Ammapet Salem - 636003',
                 ),
                 // const SizedBox(height: 10),
                 // const _ContactDetailCard(
@@ -350,7 +424,7 @@ class _ContactDetailCard extends StatelessWidget {
     required this.iconColor,
     required this.title,
     required this.primaryDetail,
-    required this.secondaryDetail,
+    // required this.secondaryDetail,
   });
 
   final IconData icon;
@@ -358,7 +432,7 @@ class _ContactDetailCard extends StatelessWidget {
   final Color iconColor;
   final String title;
   final String primaryDetail;
-  final String secondaryDetail;
+  // final String secondaryDetail;
 
   @override
   Widget build(BuildContext context) {
@@ -395,14 +469,14 @@ class _ContactDetailCard extends StatelessWidget {
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  secondaryDetail,
-                  style: AppTypography.bodyMedium.copyWith(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
+                // const SizedBox(height: 2),
+                // Text(
+                //   secondaryDetail,
+                //   style: AppTypography.bodyMedium.copyWith(
+                //     fontSize: 13,
+                //     color: AppColors.textSecondary,
+                //   ),
+                // ),
               ],
             ),
           ),

@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<link rel="stylesheet" href="katex.min.css" />
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    box-sizing: border-box;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.85;
+    color: #3A1E0B;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    padding: 2px 0 8px 0;
+    box-sizing: border-box;
+  }
+  #content {
+    padding-bottom: 6px;
+    box-sizing: border-box;
+  }
+  #content > *:first-child { margin-top: 0; }
+  #content > *:last-child { margin-bottom: 4px; }
+  img { max-width: 100%; height: auto; border-radius: 8px; display: block; margin: 6px 0; }
+  p { margin: 0 0 6px; line-height: 1.85; }
+  .katex {
+    font-size: 1.08em;
+    line-height: 1.35;
+    white-space: normal;
+  }
+  .katex-html {
+    overflow: visible;
+  }
+  .katex-display {
+    margin: 6px 0;
+    padding: 4px 0 8px 0;
+  }
+</style>
+</head>
+<body>
+  <div id="content"></div>
+  <script>
+    function postHeight() {
+      if (window.FlutterHeight) {
+        var body = document.body;
+        var html = document.documentElement;
+        var content = document.getElementById('content');
+        var rect = content ? content.getBoundingClientRect() : null;
+        var h = Math.ceil(Math.max(
+          body.scrollHeight,
+          body.offsetHeight,
+          html.scrollHeight,
+          html.offsetHeight,
+          rect ? (rect.bottom + 8) : 0
+        ));
+        window.FlutterHeight.postMessage(String(h));
+      }
+    }
+    window.addEventListener('load', function() {
+      postHeight();
+      setTimeout(postHeight, 50);
+      setTimeout(postHeight, 200);
+    });
+    if (window.ResizeObserver) {
+      new ResizeObserver(function() { postHeight(); }).observe(document.body);
+    }
+    postHeight();
+  </script>
+</body>
+</html>

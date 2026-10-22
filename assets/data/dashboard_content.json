@@ -1,6 +1,6 @@
 {
   "school": {
-    "name": "TKS Academy",
+    "name": "Ramar's Academy",
     "location": "Tamil Nadu, India"
   },
   "resources": [
@@ -127,8 +127,8 @@
       "mentorFollowers": "236k followers",
       "description": "In this class, you will learn responsive grid systems, UX structure, and practical layout decisions for real mobile products.",
       "youtubeId": "c9Wg6Cb_YlU",
-      "thumbnailAsset": "assets/images/tks_campus_banner.png",
-      "mentorAvatarAsset": "assets/images/tks_mentor_avatar.png",
+      "thumbnailAsset": "assets/images/ramars_campus_banner.png",
+      "mentorAvatarAsset": "assets/images/ramars_mentor_avatar.png",
       "subjects": [
         {
           "title": "Design Foundations",
@@ -196,8 +196,8 @@
       "mentorFollowers": "118k followers",
       "description": "This dummy course uses a YouTube lesson as the hero media and gives you a clean course detail layout to keep building on.",
       "youtubeId": "W6NZfCO5SIk",
-      "thumbnailAsset": "assets/images/tks_campus_banner.png",
-      "mentorAvatarAsset": "assets/images/tks_mentor_avatar.png",
+      "thumbnailAsset": "assets/images/ramars_campus_banner.png",
+      "mentorAvatarAsset": "assets/images/ramars_mentor_avatar.png",
       "subjects": [
         {
           "title": "Arrays and Strings",
@@ -254,8 +254,8 @@
       "mentorFollowers": "302k followers",
       "description": "A practical classroom-style Python course wired to a YouTube lesson so the Videos section and course details share the same sample media source.",
       "youtubeId": "rfscVS0vtbw",
-      "thumbnailAsset": "assets/images/tks_campus_banner.png",
-      "mentorAvatarAsset": "assets/images/tks_mentor_avatar.png",
+      "thumbnailAsset": "assets/images/ramars_campus_banner.png",
+      "mentorAvatarAsset": "assets/images/ramars_mentor_avatar.png",
       "subjects": [
         {
           "title": "Python Basics",

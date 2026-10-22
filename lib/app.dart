@@ -10,14 +10,14 @@ import 'core/theme/app_theme.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
-class TksApp extends StatefulWidget {
-  const TksApp({super.key});
+class RamarsApp extends StatefulWidget {
+  const RamarsApp({super.key});
 
   @override
-  State<TksApp> createState() => _TksAppState();
+  State<RamarsApp> createState() => _RamarsAppState();
 }
 
-class _TksAppState extends State<TksApp> {
+class _RamarsAppState extends State<RamarsApp> {
   final _sessionState = SessionState();
 
   @override
@@ -47,7 +47,7 @@ class _TksAppState extends State<TksApp> {
       child: MaterialApp(
         navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
-        title: 'TKS Academy',
+        title: "Ramar's Academy",
         themeMode: ThemeMode.light,
         theme: AppTheme.lightTheme,
         home: const SplashScreen(),
@@ -55,3 +55,6 @@ class _TksAppState extends State<TksApp> {
     );
   }
 }
+
+// Backward compatibility alias
+typedef TksApp = RamarsApp;

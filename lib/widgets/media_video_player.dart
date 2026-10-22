@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
+import '../core/theme/app_colors.dart';
 
 const _speedOptions = [1.0, 1.5, 2.0, 2.5, 3.0];
 
@@ -471,8 +472,8 @@ class _VideoSurfaceState extends State<_VideoSurface> {
                           overlayShape: const RoundSliderOverlayShape(
                             overlayRadius: 10,
                           ),
-                          activeTrackColor: const Color(0xFFF97316),
-                          thumbColor: const Color(0xFFF97316),
+                          activeTrackColor: AppColors.secondary,
+                          thumbColor: AppColors.secondary,
                           inactiveTrackColor: Colors.white30,
                         ),
                         child: Slider(
@@ -497,7 +498,7 @@ class _VideoSurfaceState extends State<_VideoSurface> {
                     PopupMenuButton<double>(
                       initialValue: widget.speed,
                       onSelected: widget.onSpeedChanged,
-                      color: const Color(0xFF2A180E),
+                      color: const Color(0xFF0F172A),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -509,7 +510,7 @@ class _VideoSurfaceState extends State<_VideoSurface> {
                                 _formatSpeed(s),
                                 style: TextStyle(
                                   color: s == widget.speed
-                                      ? const Color(0xFFF97316)
+                                      ? AppColors.secondary
                                       : Colors.white,
                                   fontWeight: s == widget.speed
                                       ? FontWeight.bold

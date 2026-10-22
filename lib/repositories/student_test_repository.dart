@@ -9,9 +9,9 @@ class StudentTestRepository {
 
   final ApiClient _client;
 
-  Future<List<StudentTest>> fetchTestsByVideo(String videoId) async {
+  Future<List<StudentTest>> fetchTestsByTopic(String topicId) async {
     try {
-      final response = await _client.get('/api/tests/student/video/$videoId');
+      final response = await _client.get('/api/tests/student/topic/$topicId');
       final body = StudentTestListResponse.fromJson(
         response.data as Map<String, dynamic>,
       );
@@ -39,16 +39,19 @@ class StudentTestRepository {
     }
   }
 
+  /// [videoId] is optional context only — pass it when the test was reached
+  /// via a topic that has a linked video, omit it otherwise (e.g. the flat
+  /// "MCQ Test" course category, which has no video at all).
   Future<StudentAttemptResult> submitAttempt({
     required String testId,
-    required String videoId,
+    String? videoId,
     required DateTime startedAt,
     required DateTime submittedAt,
     required List<AttemptAnswer> answers,
     String status = 'COMPLETED',
   }) async {
     final payload = {
-      'videoId': videoId,
+      if (videoId != null && videoId.isNotEmpty) 'videoId': videoId,
       'status': status,
       'startedAt': startedAt.toUtc().toIso8601String(),
       'submittedAt': submittedAt.toUtc().toIso8601String(),

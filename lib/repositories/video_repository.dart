@@ -9,27 +9,18 @@ class VideoRepository {
 
   final ApiClient _client;
 
-  Future<VideosData> fetchVideos({
-    required String courseId,
-    required String chapter,
-  }) async {
+  Future<VideoLesson> fetchVideoById(String videoId) async {
     try {
-      final response = await _client.get(
-        '/api/videos',
-        queryParameters: {'courseId': courseId, 'chapter': chapter},
-      );
-      final body = VideosResponse.fromJson(
+      final response = await _client.get('/api/videos/$videoId');
+      final body = VideoResponse.fromJson(
         response.data as Map<String, dynamic>,
       );
       if (!body.success || body.data == null) {
-        throw ApiException(body.message);
+        throw ApiException(body.message, statusCode: response.statusCode);
       }
       return body.data!;
     } on DioException catch (e) {
-      final error = mapDioError(e);
-      throw error;
-    } catch (e) {
-      rethrow;
+      throw mapDioError(e);
     }
   }
 }

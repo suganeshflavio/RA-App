@@ -24,20 +24,20 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
 
   final List<IntroPage> _introPages = const [
     IntroPage(
-      title: 'Welcome to TKS Academy',
-      description: 'Learn from industry experts with structured video courses & study resources.',
+      title: "Welcome to Ramar's Academy",
+      description: 'Master NEET & JEE Physics with conceptual clarity, video lectures & comprehensive resources.',
       icon: Icons.rocket_launch_rounded,
       color: AppColors.primary,
     ),
     IntroPage(
       title: 'Learn Anytime & Anywhere',
-      description: 'Access video lessons, notes, and tests at your convenience.',
+      description: 'Access video lectures, physics revision notes, and test series at your convenience.',
       icon: Icons.schedule_rounded,
       color: AppColors.secondary,
     ),
     IntroPage(
-      title: 'Master New Skills',
-      description: 'Test your knowledge with instant MCQ assessments and track progress.',
+      title: 'Crack Competitive Exams',
+      description: 'Test your knowledge with chapterwise MCQ assessments and track real-time analytics.',
       icon: Icons.trending_up_rounded,
       color: AppColors.primaryDark,
     ),

@@ -28,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+    _scaleAnimation = Tween<double>(begin: 0.82, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -65,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundWarm,
+      backgroundColor: Colors.white,
       body: Container(
         decoration: const BoxDecoration(
           gradient: AppColors.heroGradient,
@@ -81,30 +81,65 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const AppLogo(size: 130),
-                      const SizedBox(height: 28),
+                      // High-quality emblem badge with soft shadow
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.12),
+                              blurRadius: 28,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: const AppLogo(size: 144),
+                      ),
+                      const SizedBox(height: 26),
                       Text(
-                        'TKS Academy',
+                        "Ramar's Academy",
                         style: AppTypography.displayLarge.copyWith(
                           fontSize: 32,
-                          color: AppColors.textPrimary,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 6),
+                            horizontal: 18, vertical: 6),
                         decoration: BoxDecoration(
                           color: AppColors.primaryLight,
                           borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          'Learn Anytime & Anywhere',
-                          style: AppTypography.labelSmall.copyWith(
-                            color: AppColors.primaryDark,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
+                          border: Border.all(
+                            color: AppColors.secondary.withValues(alpha: 0.25),
+                            width: 1,
                           ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: AppColors.secondary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'NEET / JEE • PHYSICS',
+                              style: AppTypography.labelSmall.copyWith(
+                                color: AppColors.primaryDark,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 48),
@@ -114,7 +149,7 @@ class _SplashScreenState extends State<SplashScreen>
                         child: CircularProgressIndicator(
                           strokeWidth: 2.5,
                           valueColor:
-                              AlwaysStoppedAnimation<Color>(AppColors.primary),
+                              AlwaysStoppedAnimation<Color>(AppColors.secondary),
                         ),
                       ),
                     ],

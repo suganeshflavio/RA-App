@@ -6,5 +6,5 @@ import 'core/config/env.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Env.load();
-  runApp(const TksApp());
+  runApp(const RamarsApp());
 }

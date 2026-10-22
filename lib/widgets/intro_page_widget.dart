@@ -17,7 +17,7 @@ class IntroPageWidget extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: isDark
               ? [const Color(0xFF1A1A1A), const Color(0xFF2D2D2D)]
-              : [const Color(0xFFFFF8F0), page.color.withValues(alpha: 0.1)],
+              : [Colors.white, page.color.withValues(alpha: 0.08)],
           stops: const [0.0, 1.0],
         ),
       ),

@@ -5,8 +5,8 @@ class Shimmer extends StatefulWidget {
   const Shimmer({
     super.key,
     required this.child,
-    this.baseColor = const Color(0xFFF3E7DB),
-    this.highlightColor = const Color(0xFFFFF7F0),
+    this.baseColor = const Color(0xFFE2E8F0),
+    this.highlightColor = const Color(0xFFF8FAFC),
     this.duration = const Duration(milliseconds: 1400),
   });
 
@@ -92,7 +92,7 @@ class Skeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     final shimmer = Shimmer.of(context);
     final baseDecoration = BoxDecoration(
-      color: shimmer != null ? Colors.white : const Color(0xFFF3E7DB),
+      color: shimmer != null ? Colors.white : const Color(0xFFE2E8F0),
       shape: shape,
       borderRadius: shape == BoxShape.rectangle
           ? BorderRadius.circular(borderRadius)
@@ -225,7 +225,7 @@ class CourseListSkeleton extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: const Color(0xFFFFEAD8)),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
               child: Row(
                 children: [
@@ -280,7 +280,7 @@ class VideoListSkeleton extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFFFEAD8)),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,7 +345,7 @@ class CommentListSkeleton extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFFFEAD8)),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -391,7 +391,7 @@ class DocumentSkeleton extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFFFFEAD8)),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

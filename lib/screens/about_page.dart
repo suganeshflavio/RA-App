@@ -86,7 +86,7 @@ class AboutPage extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(20),
                         child: Text(
-                          'TKS Academy is a premier educational platform dedicated to conceptual clarity, competitive exam excellence, and empowering students to achieve their academic goals.',
+                          "Ramar's Academy is a premier educational institution dedicated to conceptual clarity, competitive exam excellence in NEET/JEE Physics, and empowering students to achieve their academic goals.",
                           textAlign: TextAlign.center,
                           style: AppTypography.bodyLarge.copyWith(
                             height: 1.5,
@@ -110,7 +110,7 @@ class AboutPage extends StatelessWidget {
 
                 // Why Choose Us
                 Text(
-                  'Why Choose TKS Academy?',
+                  "Why Choose Ramar's Academy?",
                   style: AppTypography.titleLarge,
                 ),
                 const SizedBox(height: 12),
@@ -288,7 +288,7 @@ class _WhyChooseUsSection extends StatelessWidget {
       'icon': Icons.school_rounded,
       'title': 'Expert Faculty Guidance',
       'subtitle': 'Learn from experienced and dedicated educators.',
-      'color': Color(0xFFF97316),
+      'color': AppColors.secondary,
     },
     {
       'icon': Icons.psychology_rounded,
@@ -330,7 +330,7 @@ class _WhyChooseUsSection extends StatelessWidget {
     {
       'icon': Icons.devices_rounded,
       'title': 'Smart Digital Learning',
-      'subtitle': 'Learn anytime, anywhere through the TKS Academy App.',
+      'subtitle': "Learn anytime, anywhere through the Ramar's Academy App.",
       'color': Color(0xFF06B6D4),
     },
     {
@@ -665,7 +665,7 @@ class _VisionQuoteCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              'TKS Academy — Where Concepts Become Confidence, and Confidence Becomes Success.',
+              "Ramar's Academy — Where Concepts Become Confidence, and Confidence Becomes Success.",
               textAlign: TextAlign.center,
               style: AppTypography.labelLarge.copyWith(
                 color: AppColors.primaryDark,

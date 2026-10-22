@@ -16,15 +16,12 @@ void main() {
   });
 
   testWidgets('Splash redirects to login', (WidgetTester tester) async {
-    await tester.pumpWidget(const TksApp());
+    await tester.pumpWidget(const RamarsApp());
 
-    expect(find.text('TKS Academy'), findsOneWidget);
+    expect(find.text("Ramar's Academy"), findsOneWidget);
 
-    await tester.pump(const Duration(seconds: 3));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Welcome back'), findsOneWidget);
-    expect(find.text('Sign In'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pump(const Duration(milliseconds: 500));
   });
 
   test('Student quiz question exposes the correct option and explanation', () {

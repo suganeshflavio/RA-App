@@ -12,7 +12,6 @@ import '../widgets/custom_card.dart';
 import '../widgets/custom_text_field.dart';
 import 'forgot_password_page.dart';
 import 'root_shell.dart';
-import 'signup_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

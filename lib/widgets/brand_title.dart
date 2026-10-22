@@ -10,7 +10,7 @@ class BrandTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final label = width < _smallScreenBreakpoint ? 'TKS' : 'TKS Academy';
+    final label = width < _smallScreenBreakpoint ? "Ramar's" : "Ramar's Academy";
     return Text(label, style: style);
   }
 }

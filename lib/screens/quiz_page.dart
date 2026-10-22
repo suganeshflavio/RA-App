@@ -3,19 +3,29 @@ import 'package:flutter/material.dart';
 import '../core/network/api_client.dart';
 import '../core/network/api_exception.dart';
 import '../models/student_test.dart';
-import '../models/video_lesson.dart';
 import '../repositories/student_test_repository.dart';
 
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_typography.dart';
 import '../widgets/app_background.dart';
-import '../widgets/custom_buttons.dart';
 import '../widgets/custom_card.dart';
+import '../widgets/rich_content_view.dart';
 
+/// A single MCQ test, one question per screen. Reached either directly by
+/// [testId] (the flat "MCQ Test" course category, or a topic's MCQ tile).
+/// [videoId] is passed through to the attempt only when this test was
+/// reached via a topic that also has a linked video.
 class QuizPage extends StatefulWidget {
-  const QuizPage({super.key, required this.video});
+  const QuizPage({
+    super.key,
+    required this.testId,
+    this.videoId,
+    this.title,
+  });
 
-  final VideoLesson video;
+  final String testId;
+  final String? videoId;
+  final String? title;
 
   @override
   State<QuizPage> createState() => _QuizPageState();
@@ -24,85 +34,68 @@ class QuizPage extends StatefulWidget {
 class _QuizPageState extends State<QuizPage> {
   final StudentTestRepository _repository = StudentTestRepository(ApiClient());
 
-  late Future<List<StudentTest>> _testsFuture;
-
-  StudentTest? _activeTest;
-  StudentTest? _lastSubmittedTest;
+  late Future<StudentTest> _testFuture;
   DateTime? _startedAt;
+  int _currentIndex = 0;
   bool _isSubmitting = false;
-  bool _isLoadingTest = false;
-  String? _loadingTestId;
   StudentAttemptResult? _result;
+  StudentTest? _submittedTest;
 
   final Map<String, String> _answersByQuestionId = <String, String>{};
 
   @override
   void initState() {
     super.initState();
-    _testsFuture = _repository.fetchTestsByVideo(widget.video.id);
+    _testFuture = _load();
   }
 
-  Future<void> _loadTest(String testId) async {
-    setState(() {
-      _isLoadingTest = true;
-      _loadingTestId = testId;
-      _activeTest = null;
-      _startedAt = null;
-      _result = null;
-      _answersByQuestionId.clear();
-    });
+  Future<StudentTest> _load() async {
+    final test = await _repository.fetchTestById(widget.testId);
+    _startedAt = DateTime.now().toUtc();
+    return test;
+  }
 
-    try {
-      final fullTest = await _repository.fetchTestById(testId);
-      if (!mounted) return;
-      setState(() {
-        _activeTest = fullTest;
-        _startedAt = DateTime.now().toUtc();
-      });
-    } catch (e) {
-      if (!mounted) return;
-      final message = e is ApiException ? e.message : 'Unable to load test.';
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(message)));
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoadingTest = false;
-          _loadingTestId = null;
-        });
-      }
+  void _retry() {
+    setState(() {
+      _testFuture = _load();
+      _currentIndex = 0;
+      _answersByQuestionId.clear();
+      _result = null;
+      _submittedTest = null;
+    });
+  }
+
+  void _selectAnswer(String questionId, String option) {
+    setState(() => _answersByQuestionId[questionId] = option);
+  }
+
+  void _goPrevious() {
+    if (_currentIndex > 0) setState(() => _currentIndex -= 1);
+  }
+
+  void _goNext(int totalQuestions) {
+    if (_currentIndex < totalQuestions - 1) {
+      setState(() => _currentIndex += 1);
     }
   }
 
-  Future<void> _submit() async {
-    final test = _activeTest;
+  Future<void> _submit(StudentTest test) async {
     final startedAt = _startedAt;
-    if (test == null || startedAt == null || _isSubmitting) return;
+    if (startedAt == null || _isSubmitting) return;
 
-    final total = test.questions.length;
-    if (_answersByQuestionId.length != total) {
+    if (_answersByQuestionId.length != test.questions.length) {
+      final firstUnanswered = test.questions.indexWhere(
+        (q) => !_answersByQuestionId.containsKey(q.id),
+      );
+      if (firstUnanswered != -1) {
+        setState(() => _currentIndex = firstUnanswered);
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: AppColors.warning,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           content: const Text('Please answer all questions before submitting.'),
-        ),
-      );
-      return;
-    }
-
-    final invalidSelection = _answersByQuestionId.values.any(
-      (value) => value != 'A' && value != 'B' && value != 'C' && value != 'D',
-    );
-    if (invalidSelection) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: AppColors.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          content: const Text('Invalid option detected.'),
         ),
       );
       return;
@@ -122,7 +115,7 @@ class _QuizPageState extends State<QuizPage> {
 
       final result = await _repository.submitAttempt(
         testId: test.id,
-        videoId: test.videoId.isNotEmpty ? test.videoId : widget.video.id,
+        videoId: widget.videoId,
         startedAt: startedAt,
         submittedAt: DateTime.now().toUtc(),
         answers: answers,
@@ -132,25 +125,12 @@ class _QuizPageState extends State<QuizPage> {
       if (!mounted) return;
       setState(() {
         _result = result;
-        _lastSubmittedTest = test;
-        _activeTest = null;
+        _submittedTest = test;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: AppColors.success,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          content: const Text('Test submitted successfully.'),
-        ),
-      );
     } catch (e) {
       if (!mounted) return;
-      final message = e is ApiException
-          ? e.message
-          : 'Unable to submit attempt.';
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(message)));
+      final message = e is ApiException ? e.message : 'Unable to submit attempt.';
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -160,11 +140,11 @@ class _QuizPageState extends State<QuizPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MCQ Assessment'),
+        title: Text(widget.title ?? 'MCQ Assessment'),
       ),
       body: AppBackground(
-        child: FutureBuilder<List<StudentTest>>(
-          future: _testsFuture,
+        child: FutureBuilder<StudentTest>(
+          future: _testFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
               return const Center(
@@ -175,19 +155,13 @@ class _QuizPageState extends State<QuizPage> {
             if (snapshot.hasError) {
               final message = snapshot.error is ApiException
                   ? (snapshot.error as ApiException).message
-                  : 'Unable to load tests.';
-              return _ErrorView(
-                message: message,
-                onRetry: () {
-                  setState(() {
-                    _testsFuture = _repository.fetchTestsByVideo(widget.video.id);
-                  });
-                },
-              );
+                  : 'Unable to load this test.';
+              return _ErrorView(message: message, onRetry: _retry);
             }
 
-            final tests = snapshot.data ?? <StudentTest>[];
-            if (tests.isEmpty) {
+            final test = snapshot.data!;
+
+            if (test.questions.isEmpty) {
               return Center(
                 child: AppCard(
                   padding: const EdgeInsets.all(28),
@@ -201,7 +175,7 @@ class _QuizPageState extends State<QuizPage> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'No MCQ / Tests available for this video yet.',
+                        'This test has no questions yet.',
                         style: AppTypography.bodyMedium,
                         textAlign: TextAlign.center,
                       ),
@@ -211,350 +185,220 @@ class _QuizPageState extends State<QuizPage> {
               );
             }
 
-            if (_activeTest == null) {
-              if (_result != null && _lastSubmittedTest != null) {
-                return _SubmittedResultView(
-                  test: _lastSubmittedTest!,
-                  result: _result!,
-                  onRetry: () {
-                    setState(() {
-                      _result = null;
-                      _lastSubmittedTest = null;
-                      _answersByQuestionId.clear();
-                    });
-                  },
-                  onStartAgain: () {
-                    setState(() {
-                      _result = null;
-                      _lastSubmittedTest = null;
-                      _answersByQuestionId.clear();
-                      _activeTest = null;
-                      _startedAt = null;
-                    });
-                  },
-                );
-              }
-
-              return ListView.separated(
-                padding: const EdgeInsets.all(18),
-                itemCount: tests.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 14),
-                itemBuilder: (context, index) {
-                  final test = tests[index];
-                  final isCompleted =
-                      _result != null && _lastSubmittedTest?.id == test.id;
-                  final isThisTestLoading =
-                      _isLoadingTest && _loadingTestId == test.id;
-
-                  return AppCard(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          test.testName,
-                          style: AppTypography.titleLarge,
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '${test.totalQuestions} questions • ${test.marksPerQuestion} mark(s) each',
-                          style: AppTypography.labelSmall,
-                        ),
-                        if (isCompleted && _result != null) ...[
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryLight,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              'Score: ${_result!.obtainedMarks}/${_result!.totalMarks} '
-                              '(Correct: ${_result!.correctAnswers}, Wrong: ${_result!.wrongAnswers})',
-                              style: AppTypography.titleMedium.copyWith(
-                                fontSize: 14,
-                                color: AppColors.primaryDark,
-                              ),
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: 16),
-                        AppPrimaryButton(
-                          text: isThisTestLoading
-                              ? 'Loading Test...'
-                              : isCompleted
-                              ? 'Retake MCQ'
-                              : 'Start MCQ',
-                          icon: isThisTestLoading
-                              ? null
-                              : Icons.play_arrow_rounded,
-                          isLoading: isThisTestLoading,
-                          onPressed: _isLoadingTest ? null : () => _loadTest(test.id),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
+            if (_result != null && _submittedTest != null) {
+              return _SubmittedResultView(test: _submittedTest!, result: _result!);
             }
 
-          final test = _activeTest!;
-          return Column(
+            return _QuestionPager(
+              test: test,
+              currentIndex: _currentIndex,
+              answersByQuestionId: _answersByQuestionId,
+              isSubmitting: _isSubmitting,
+              onSelectAnswer: _selectAnswer,
+              onPrevious: _goPrevious,
+              onNext: () => _goNext(test.questions.length),
+              onSubmit: () => _submit(test),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _QuestionPager extends StatelessWidget {
+  const _QuestionPager({
+    required this.test,
+    required this.currentIndex,
+    required this.answersByQuestionId,
+    required this.isSubmitting,
+    required this.onSelectAnswer,
+    required this.onPrevious,
+    required this.onNext,
+    required this.onSubmit,
+  });
+
+  final StudentTest test;
+  final int currentIndex;
+  final Map<String, String> answersByQuestionId;
+  final bool isSubmitting;
+  final void Function(String questionId, String option) onSelectAnswer;
+  final VoidCallback onPrevious;
+  final VoidCallback onNext;
+  final VoidCallback onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    final total = test.questions.length;
+    final question = test.questions[currentIndex];
+    final selected = answersByQuestionId[question.id];
+    final isLast = currentIndex == total - 1;
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                  itemCount: test.questions.length,
-                  itemBuilder: (context, index) {
-                    final question = test.questions[index];
-                    final selected = _answersByQuestionId[question.id];
-                    final isSubmitted = _result != null;
-                    final selectedIsCorrect =
-                        selected != null && selected == question.correctOption;
-                    final correctLabel = question.correctOption.isEmpty
-                        ? ''
-                        : 'Correct answer: ${question.correctOption}';
-
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: const Color(0xFFFFDDBF)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Q${index + 1}. ${question.question}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF3A1E0B),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          ...question.options.entries.map((entry) {
-                            final isSelected = selected == entry.key;
-                            final isCorrectChoice =
-                                entry.key == question.correctOption;
-                            final tileColor = isSubmitted
-                                ? isCorrectChoice
-                                      ? const Color(0xFFE9F9EF)
-                                      : isSelected
-                                      ? const Color(0xFFFFEAEA)
-                                      : Colors.white
-                                : isSelected
-                                ? const Color(0xFFFFF1E7)
-                                : Colors.white;
-                            final borderColor = isSubmitted
-                                ? isCorrectChoice
-                                      ? const Color(0xFF2EAE66)
-                                      : isSelected
-                                      ? const Color(0xFFE75F5F)
-                                      : const Color(0xFFFFDDBF)
-                                : isSelected
-                                ? const Color(0xFFF97316)
-                                : const Color(0xFFFFDDBF);
-                            final iconColor = isSubmitted
-                                ? isCorrectChoice
-                                      ? const Color(0xFF2EAE66)
-                                      : isSelected
-                                      ? const Color(0xFFE75F5F)
-                                      : const Color(0xFF8F6A4D)
-                                : isSelected
-                                ? const Color(0xFFF97316)
-                                : const Color(0xFF8F6A4D);
-
-                            final optionIcon = isSubmitted && isCorrectChoice
-                                ? Icons.check_circle_rounded
-                                : isSelected
-                                ? Icons.radio_button_checked
-                                : Icons.radio_button_off;
-
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(10),
-                                onTap: isSubmitted
-                                    ? null
-                                    : () {
-                                        setState(() {
-                                          _answersByQuestionId[question.id] =
-                                              entry.key;
-                                        });
-                                      },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 10,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: tileColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: borderColor),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(optionIcon, color: iconColor),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: Text(
-                                          '${entry.key}. ${entry.value}',
-                                          style: TextStyle(
-                                            color:
-                                                isSubmitted && isCorrectChoice
-                                                ? const Color(0xFF1D7C4D)
-                                                : isSelected
-                                                ? const Color(0xFFB33A3A)
-                                                : const Color(0xFF3A1E0B),
-                                            fontWeight:
-                                                isSubmitted && isCorrectChoice
-                                                ? FontWeight.w700
-                                                : FontWeight.normal,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          }),
-                          if (isSubmitted) ...[
-                            const SizedBox(height: 10),
-                            if (selectedIsCorrect ||
-                                correctLabel.isNotEmpty ||
-                                question.answerExplanation.isNotEmpty)
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: selectedIsCorrect
-                                      ? const Color(0xFFE9F9EF)
-                                      : const Color(0xFFFFF1F1),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (selectedIsCorrect ||
-                                        correctLabel.isNotEmpty)
-                                      Text(
-                                        selectedIsCorrect
-                                            ? 'Correct answer selected.'
-                                            : correctLabel,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          color: selectedIsCorrect
-                                              ? const Color(0xFF1D7C4D)
-                                              : const Color(0xFFB33A3A),
-                                        ),
-                                      ),
-                                    if (question
-                                        .answerExplanation
-                                        .isNotEmpty) ...[
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Explanation: ${question.answerExplanation}',
-                                        style: const TextStyle(
-                                          color: Color(0xFF3A1E0B),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ],
-                      ),
-                    );
-                  },
+              Text(
+                'Question ${currentIndex + 1} of $total',
+                style: AppTypography.labelSmall.copyWith(
+                  color: AppColors.primaryDark,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: LinearProgressIndicator(
+                  value: (currentIndex + 1) / total,
+                  minHeight: 6,
+                  backgroundColor: AppColors.primaryLight,
+                  valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
               Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFF6EE),
-                  border: Border(top: BorderSide(color: Color(0xFFFFDDBF))),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.cardBorder),
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (_result != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Text(
-                          'Score: ${_result!.obtainedMarks}/${_result!.totalMarks} '
-                          '(Correct: ${_result!.correctAnswers}, Wrong: ${_result!.wrongAnswers})',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF3A1E0B),
-                          ),
-                        ),
+                    RichContentView(
+                      html: question.question,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
                       ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: _isSubmitting
-                                ? null
-                                : () => setState(() {
-                                    _activeTest = null;
-                                    _startedAt = null;
-                                    _answersByQuestionId.clear();
-                                    if (_result == null) {
-                                      _lastSubmittedTest = null;
-                                    }
-                                  }),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(0xFFF97316),
-                              side: const BorderSide(color: Color(0xFFF97316)),
-                              minimumSize: const Size.fromHeight(46),
-                            ),
-                            child: const Text('Back'),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: _isSubmitting ? null : _submit,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFF97316),
-                              foregroundColor: Colors.white,
-                              minimumSize: const Size.fromHeight(46),
-                            ),
-                            child: Text(
-                              _isSubmitting ? 'Submitting...' : 'Submit Test',
-                            ),
-                          ),
-                        ),
-                      ],
                     ),
+                    const SizedBox(height: 14),
+                    ...question.options.entries.map((entry) {
+                      final isSelected = selected == entry.key;
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(10),
+                          onTap: () => onSelectAnswer(question.id, entry.key),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? AppColors.primaryLight
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : AppColors.cardBorder,
+                              ),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  isSelected
+                                      ? Icons.radio_button_checked
+                                      : Icons.radio_button_off,
+                                  color: isSelected
+                                      ? AppColors.secondary
+                                      : AppColors.textMuted,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  '${entry.key}.',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: isSelected
+                                        ? AppColors.secondary
+                                        : AppColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: RichContentView(
+                                    html: entry.value,
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? AppColors.secondary
+                                          : AppColors.textPrimary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
                   ],
                 ),
               ),
             ],
-          );
-        },
-      ),
-    ),
-  );
-}
+          ),
+        ),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(top: BorderSide(color: AppColors.cardBorder)),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: currentIndex == 0 ? null : onPrevious,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary),
+                    minimumSize: const Size.fromHeight(46),
+                  ),
+                  child: const Text('Previous'),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: isSubmitting ? null : (isLast ? onSubmit : onNext),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size.fromHeight(46),
+                  ),
+                  child: Text(
+                    isSubmitting ? 'Submitting...' : (isLast ? 'Submit Test' : 'Next'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _SubmittedResultView extends StatelessWidget {
-  const _SubmittedResultView({
-    required this.test,
-    required this.result,
-    required this.onRetry,
-    required this.onStartAgain,
-  });
+  const _SubmittedResultView({required this.test, required this.result});
 
   final StudentTest test;
   final StudentAttemptResult result;
-  final VoidCallback onRetry;
-  final VoidCallback onStartAgain;
 
   @override
   Widget build(BuildContext context) {
@@ -566,7 +410,7 @@ class _SubmittedResultView extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFFFDDBF)),
+            border: Border.all(color: AppColors.cardBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -576,7 +420,7 @@ class _SubmittedResultView extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: Color(0xFF3A1E0B),
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 12),
@@ -585,31 +429,20 @@ class _SubmittedResultView extends StatelessWidget {
                 '(Correct: ${result.correctAnswers}, Wrong: ${result.wrongAnswers})',
                 style: const TextStyle(
                   fontWeight: FontWeight.w800,
-                  color: Color(0xFF3A1E0B),
+                  color: AppColors.textPrimary,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton(
-                      onPressed: onRetry,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFFF97316),
-                        side: const BorderSide(color: Color(0xFFF97316)),
-                      ),
-                      child: const Text('Back'),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
                     child: ElevatedButton(
-                      onPressed: onStartAgain,
+                      onPressed: () => Navigator.of(context).pop(),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF97316),
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                       ),
-                      child: const Text('Try Again'),
+                      child: const Text('Done'),
                     ),
                   ),
                 ],
@@ -646,19 +479,34 @@ class _SubmittedResultView extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFFFDDBF)),
+              border: Border.all(color: AppColors.cardBorder),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Q${index + 1}. ${question.question}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF3A1E0B),
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Q${index + 1}.',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: RichContentView(
+                        html: question.question,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 ...question.options.entries.map((entry) {
                   final isSelected = selected == entry.key;
                   final isCorrectChoice = entry.key == correct;
@@ -671,15 +519,15 @@ class _SubmittedResultView extends StatelessWidget {
                       ? const Color(0xFF2EAE66)
                       : isSelected
                       ? const Color(0xFFE75F5F)
-                      : const Color(0xFFFFDDBF);
+                      : AppColors.cardBorder;
                   final textColor = isCorrectChoice
                       ? const Color(0xFF1D7C4D)
                       : isSelected
                       ? const Color(0xFFB33A3A)
-                      : const Color(0xFF3A1E0B);
+                      : AppColors.textPrimary;
 
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.only(bottom: 10),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -691,6 +539,7 @@ class _SubmittedResultView extends StatelessWidget {
                         border: Border.all(color: borderColor),
                       ),
                       child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Icon(
                             isCorrectChoice
@@ -705,9 +554,19 @@ class _SubmittedResultView extends StatelessWidget {
                                 : const Color(0xFF8F6A4D),
                           ),
                           const SizedBox(width: 10),
+                          Text(
+                            '${entry.key}.',
+                            style: TextStyle(
+                              color: textColor,
+                              fontWeight: isCorrectChoice
+                                  ? FontWeight.w700
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
                           Expanded(
-                            child: Text(
-                              '${entry.key}. ${entry.value}',
+                            child: RichContentView(
+                              html: entry.value,
                               style: TextStyle(
                                 color: textColor,
                                 fontWeight: isCorrectChoice
@@ -756,9 +615,24 @@ class _SubmittedResultView extends StatelessWidget {
                           : const Color(0xFFE9F9EF),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(
-                      'Explanation: $explanation',
-                      style: const TextStyle(color: Color(0xFF3A1E0B)),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Explanation:',
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: RichContentView(
+                            html: explanation,
+                            style: const TextStyle(color: AppColors.textPrimary),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -788,13 +662,13 @@ class _ErrorView extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Color(0xFF6E4D37)),
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: onRetry,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFF97316),
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
               ),
               child: const Text('Retry'),

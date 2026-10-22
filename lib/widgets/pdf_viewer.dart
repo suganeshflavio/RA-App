@@ -6,6 +6,7 @@ import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'skeleton.dart';
+import '../core/theme/app_colors.dart';
 
 class PdfViewer extends StatefulWidget {
   const PdfViewer({super.key, required this.url});
@@ -45,7 +46,7 @@ class _PdfViewerState extends State<PdfViewer> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFFFDDBF)),
+        border: Border.all(color: AppColors.cardBorder),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
@@ -63,13 +64,13 @@ class _PdfViewerState extends State<PdfViewer> {
                   children: [
                     const Text(
                       'Unable to load the PDF.',
-                      style: TextStyle(color: Color(0xFF6E4D37)),
+                      style: TextStyle(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 12),
                     ElevatedButton(
                       onPressed: _retry,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF97316),
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                       ),
                       child: const Text('Retry'),

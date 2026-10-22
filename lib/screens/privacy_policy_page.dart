@@ -92,7 +92,7 @@ class PrivacyPolicyPage extends StatelessWidget {
 
                 // Introduction Text
                 Text(
-                  'At TKS Academy, we believe in complete transparency regarding how your data is handled. This Privacy Policy details what information we collect, why we collect it, where it is stored, and how you can exercise your privacy rights.',
+                  "At Ramar's Academy, we believe in complete transparency regarding how your data is handled. This Privacy Policy details what information we collect, why we collect it, where it is stored, and how you can exercise your privacy rights.",
                   style: AppTypography.bodyLarge.copyWith(
                     height: 1.5,
                     color: AppColors.textSecondary,
@@ -201,7 +201,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                       _PolicyItemRow(
                         title: 'Secured Cloud Servers',
                         detail:
-                            'Account details, course access records, test history, and support queries are transmitted over encrypted TLS 1.3 HTTPS connections and stored in TKS Academy’s protected cloud databases.',
+                            "Account details, course access records, test history, and support queries are transmitted over encrypted TLS 1.3 HTTPS connections and stored in Ramar's Academy’s protected cloud databases.",
                       ),
                       Divider(height: 20, color: AppColors.cardBorder),
                       _PolicyItemRow(
@@ -217,8 +217,8 @@ class PrivacyPolicyPage extends StatelessWidget {
                 // Section 4: Protection & User Rights
                 const _PolicySectionHeader(
                   icon: Icons.shield_outlined,
-                  iconColor: Color(0xFFEA580C),
-                  iconBg: Color(0xFFFFF7ED),
+                  iconColor: AppColors.primary,
+                  iconBg: AppColors.primaryLight,
                   title: '4. Data Protection & Your Rights',
                 ),
                 const SizedBox(height: 10),
@@ -230,7 +230,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                       _PolicyItemRow(
                         title: 'No Data Sale to Third Parties',
                         detail:
-                            'TKS Academy NEVER sells, rents, or trades your personal information to third-party advertising or marketing networks.',
+                            "Ramar's Academy NEVER sells, rents, or trades your personal information to third-party advertising or marketing networks.",
                       ),
                       Divider(height: 20, color: AppColors.cardBorder),
                       _PolicyItemRow(
@@ -265,18 +265,18 @@ class PrivacyPolicyPage extends StatelessWidget {
                       const SizedBox(height: 16),
                       const _ContactQuickRow(
                         icon: Icons.email_rounded,
-                        text: 'support@tksacademy.com / info@tksacademy.com',
+                        text: 'ramarsacademy@gmail.com',
                       ),
                       const SizedBox(height: 10),
                       const _ContactQuickRow(
                         icon: Icons.phone_rounded,
-                        text: '+91 98765 43210 (Toll Free: +1 800 555 0199)',
+                        text: '+91 82207 25085',
                       ),
                       const SizedBox(height: 10),
                       const _ContactQuickRow(
                         icon: Icons.location_on_rounded,
                         text:
-                            'TKS Tower, 4th Floor, Knowledge Park, Tech Corridor, Metro City - 600001',
+                            'No:6, 2nd cross vidhya Nagar, Ammapet Salem - 636003',
                       ),
                       const SizedBox(height: 20),
                       AppPrimaryButton(
