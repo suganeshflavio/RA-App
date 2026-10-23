@@ -48,19 +48,15 @@
 <body>
   <div id="content"></div>
   <script>
+    // Measures the content itself, not the page: the page's scroll/offset
+    // height is never smaller than the WebView, so measuring it made every
+    // re-measure add Flutter's safety margin again and the box kept growing.
     function postHeight() {
       if (window.FlutterHeight) {
-        var body = document.body;
-        var html = document.documentElement;
         var content = document.getElementById('content');
-        var rect = content ? content.getBoundingClientRect() : null;
-        var h = Math.ceil(Math.max(
-          body.scrollHeight,
-          body.offsetHeight,
-          html.scrollHeight,
-          html.offsetHeight,
-          rect ? (rect.bottom + 8) : 0
-        ));
+        if (!content) return;
+        var bottomPadding = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
+        var h = Math.ceil(content.getBoundingClientRect().bottom + bottomPadding);
         window.FlutterHeight.postMessage(String(h));
       }
     }
@@ -69,9 +65,13 @@
       setTimeout(postHeight, 50);
       setTimeout(postHeight, 200);
     });
+    // re-measure when images load or fonts settle
     if (window.ResizeObserver) {
-      new ResizeObserver(function() { postHeight(); }).observe(document.body);
+      new ResizeObserver(function() { postHeight(); }).observe(document.getElementById('content'));
     }
+    document.addEventListener('load', function(event) {
+      if (event.target && event.target.tagName === 'IMG') postHeight();
+    }, true);
     postHeight();
   </script>
 </body>

@@ -43,6 +43,14 @@ class StudentTestResponse {
   }
 }
 
+/// Marks without a trailing ".0" (2.0 -> "2", 1.5 -> "1.5", -0.25 -> "-0.25").
+String formatMarks(num value) {
+  final rounded = (value * 100).round() / 100;
+  return rounded == rounded.roundToDouble()
+      ? rounded.toInt().toString()
+      : rounded.toString();
+}
+
 /// A standalone MCQ test — no longer owned by one video, it's reached via
 /// whichever Topic(s) or Course it's linked to.
 class StudentTest {
@@ -50,6 +58,7 @@ class StudentTest {
     required this.id,
     required this.testName,
     required this.marksPerQuestion,
+    this.negativeMarksPerQuestion = 0,
     required this.createdAt,
     required this.updatedAt,
     required this.questions,
@@ -58,6 +67,8 @@ class StudentTest {
   final String id;
   final String testName;
   final int marksPerQuestion;
+  // deducted per wrong answer; 0 means no negative marking
+  final double negativeMarksPerQuestion;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final List<StudentTestQuestion> questions;
@@ -71,6 +82,8 @@ class StudentTest {
       id: json['id'] as String? ?? '',
       testName: json['testName'] as String? ?? 'Untitled Test',
       marksPerQuestion: (json['marksPerQuestion'] as num?)?.toInt() ?? 0,
+      negativeMarksPerQuestion:
+          (json['negativeMarksPerQuestion'] as num?)?.toDouble() ?? 0,
       createdAt: _parseDateTime(json['createdAt'] as String?),
       updatedAt: _parseDateTime(json['updatedAt'] as String?),
       questions: rawQuestions
@@ -232,6 +245,7 @@ class StudentAttemptResult {
     required this.wrongAnswers,
     required this.totalMarks,
     required this.obtainedMarks,
+    this.negativeMarksPerQuestion = 0,
     required this.submittedAt,
     this.questions = const <StudentAttemptQuestionReview>[],
   });
@@ -242,7 +256,9 @@ class StudentAttemptResult {
   final int correctAnswers;
   final int wrongAnswers;
   final int totalMarks;
-  final int obtainedMarks;
+  // fractional or negative once negative marking applies
+  final double obtainedMarks;
+  final double negativeMarksPerQuestion;
   final DateTime? submittedAt;
   final List<StudentAttemptQuestionReview> questions;
 
@@ -259,7 +275,9 @@ class StudentAttemptResult {
       correctAnswers: (json['correctAnswers'] as num?)?.toInt() ?? 0,
       wrongAnswers: (json['wrongAnswers'] as num?)?.toInt() ?? 0,
       totalMarks: (json['totalMarks'] as num?)?.toInt() ?? 0,
-      obtainedMarks: (json['obtainedMarks'] as num?)?.toInt() ?? 0,
+      obtainedMarks: (json['obtainedMarks'] as num?)?.toDouble() ?? 0,
+      negativeMarksPerQuestion:
+          (json['negativeMarksPerQuestion'] as num?)?.toDouble() ?? 0,
       submittedAt: _parseDateTime(json['submittedAt'] as String?),
       questions: rawQuestions
           .map(

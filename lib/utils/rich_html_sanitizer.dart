@@ -41,12 +41,41 @@ void _sanitizeNode(Node node) {
   }
 }
 
+// Inline images are stored as <backend>/api/uploads/image/<id>, with
+// whatever backend address was configured when the content was saved
+// (e.g. http://localhost:5000 during local development).
+final _uploadedImagePath = RegExp(r'/api/uploads/image/[A-Za-z0-9_-]+$');
+
+void _rebaseUploadedImages(Node node, String apiBaseUrl) {
+  for (final child in node.nodes) {
+    if (child is Element) {
+      if (child.localName == 'img') {
+        final src = Uri.tryParse(child.attributes['src'] ?? '');
+        if (src != null && _uploadedImagePath.hasMatch(src.path)) {
+          child.attributes['src'] = '$apiBaseUrl${src.path}';
+        }
+      }
+      _rebaseUploadedImages(child, apiBaseUrl);
+    }
+  }
+}
+
 /// Returns a sanitized HTML fragment safe to inject into the KaTeX render
 /// template. Plain text (no tags) passes through untouched.
-String sanitizeRichHtml(String rawHtml) {
+///
+/// With [apiBaseUrl], uploaded-image links are pointed at that backend, so
+/// they load from the server this app talks to rather than the address that
+/// was stored with the content.
+String sanitizeRichHtml(String rawHtml, {String? apiBaseUrl}) {
   if (rawHtml.trim().isEmpty) return '';
 
   final fragment = html_parser.parseFragment(rawHtml);
   _sanitizeNode(fragment);
+
+  final base = apiBaseUrl?.trim().replaceFirst(RegExp(r'/+$'), '');
+  if (base != null && base.isNotEmpty) {
+    _rebaseUploadedImages(fragment, base);
+  }
+
   return fragment.outerHtml;
 }
