@@ -25,6 +25,39 @@ import 'courses_page.dart';
 import 'privacy_policy_page.dart';
 import 'subject_page.dart';
 
+
+const _homeBanners = [
+  PromoBannerData(
+    badge: 'NEET and JEE PREP',
+    badgeIcon: Icons.local_fire_department_rounded,
+    title: "RAMAR'S ACADEMY",
+    subtitle: 'Master Physics with Conceptual Clarity',
+    points: [
+      'Comprehensive Video Lectures and Doubt Clearance',
+      '4,000+ Practice Questions and Exemplar Solutions',
+      'Real Exam Simulators and Performance Analytics',
+    ],
+    gradient: [Color(0xFF0B2545), Color(0xFF13315C)],
+    badgeColor: Color(0xFFC23025),
+    badgeTextColor: Colors.white,
+    accentColor: AppColors.brandGold,
+  ),
+  PromoBannerData(
+    badge: 'ACADEMIC EXCELLENCE',
+    badgeIcon: Icons.emoji_events_rounded,
+    title: 'NEET / JEE - PHYSICS',
+    subtitle: "Rank Boost Series at Ramar's Academy",
+    points: [
+      'Complete NCERT and Competitive Syllabus Coverage',
+      'Topic-wise Formula Sheets and Revision Notes',
+      'All-India Test Series and Instant Scorecards',
+    ],
+    gradient: [Color(0xFF0F1629), Color(0xFF2A1215)],
+    badgeColor: AppColors.brandGold,
+    badgeTextColor: Color(0xFF1A1206),
+    accentColor: Color(0xFFE5484D),
+  ),
+];
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -313,12 +346,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    const BannerCarousel(
-                      imagePaths: [
-                        'assets/images/ramars_banner1.jpg',
-                        'assets/images/ramars_banner2.jpg',
-                      ],
-                    ),
+                    const BannerCarousel(banners: _homeBanners),
                     const SizedBox(height: 24),
                     if (isLoadingCourses)
                       const CourseSectionSkeleton()

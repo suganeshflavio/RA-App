@@ -241,12 +241,29 @@ class _QuestionPager extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Question ${currentIndex + 1} of $total',
-                style: AppTypography.labelSmall.copyWith(
-                  color: AppColors.primaryDark,
-                  fontWeight: FontWeight.w700,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Question ${currentIndex + 1} of $total',
+                      style: AppTypography.labelSmall.copyWith(
+                        color: AppColors.primaryDark,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    test.negativeMarksPerQuestion > 0
+                        ? '+${test.marksPerQuestion} correct · −${formatMarks(test.negativeMarksPerQuestion)} wrong'
+                        : '+${test.marksPerQuestion} per correct answer',
+                    style: AppTypography.labelSmall.copyWith(
+                      color: test.negativeMarksPerQuestion > 0
+                          ? AppColors.secondary
+                          : AppColors.primaryDark,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
               ClipRRect(
@@ -425,13 +442,22 @@ class _SubmittedResultView extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Score: ${result.obtainedMarks}/${result.totalMarks} '
+                'Score: ${formatMarks(result.obtainedMarks)}/${result.totalMarks} '
                 '(Correct: ${result.correctAnswers}, Wrong: ${result.wrongAnswers})',
                 style: const TextStyle(
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
                 ),
               ),
+              if (result.negativeMarksPerQuestion > 0) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'Negative marking: −${formatMarks(result.negativeMarksPerQuestion)} '
+                  'for each wrong answer '
+                  '(−${formatMarks(result.wrongAnswers * result.negativeMarksPerQuestion)} in total)',
+                  style: const TextStyle(color: AppColors.textSecondary),
+                ),
+              ],
               const SizedBox(height: 12),
               Row(
                 children: [

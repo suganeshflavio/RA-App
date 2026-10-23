@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../core/config/env.dart';
 import '../core/theme/app_typography.dart';
 import '../utils/rich_html_sanitizer.dart';
 
@@ -84,7 +85,7 @@ class _RichContentViewState extends State<RichContentView> {
   Future<void> _injectContent() async {
     final controller = _controller;
     if (controller == null) return;
-    final sanitized = sanitizeRichHtml(widget.html);
+    final sanitized = sanitizeRichHtml(widget.html, apiBaseUrl: Env.apiBaseUrl);
     final encoded = jsonEncode(sanitized);
 
     final color = widget.style?.color;
